@@ -10,7 +10,7 @@ import (
 )
 
 type User struct {
-	Id        int    `mapstructure:"id"`
+	Id        int    `mapstructure:"user_id"`
 	Username  string `mapstructure:"username"`
 	Password  string `mapstructure:"password"`
 	Mobile    string `mapstructure:"mobile"`
