@@ -39,5 +39,29 @@ func (b *ApiBuilder) Invoke(
 		list := helpers.PbStructsToMapList(response.GetResult())
 		return mapstructure.Decode(list, out)
 	}
+
+	if b.apiType == APITYPE_EXEC {
+		request := &pbfiles.ExecRequest{
+			Name:   b.name,
+			Params: params.Build(),
+		}
+
+		response, err := client.Exec(ctx, request)
+		if err != nil {
+			return err
+		}
+
+		var m map[string]interface{}
+		if response.Select != nil {
+			m = response.Select.AsMap()
+			m["_RowsAffected"] = response.RowsAffected
+		} else {
+			m = map[string]interface{}{
+				"_RowsAffected": response.RowsAffected,
+			}
+		}
+		return mapstructure.Decode(m, out)
+	}
+
 	return nil
 }

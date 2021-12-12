@@ -18,6 +18,11 @@ type User struct {
 	UpdatedAt string `mapstructure:"updated_at"`
 }
 
+type UserAddResult struct {
+	UserId       int `mapstructure:"user_id"`
+	RowsAffected int `mapstructure:"user_id"`
+}
+
 func main() {
 	cc, err := grpc.DialContext(context.Background(),
 		"localhost:8080",
@@ -28,16 +33,16 @@ func main() {
 	}
 	client := pbfiles.NewDBServiceClient(cc)
 
-	paramBuilder := builder.NewParamBuilder().Add("id", 1)
+	params := builder.NewParamBuilder().
+		Add("username", "jialiang7").
+		Add("mobile", "18011801988").
+		Add("password", "123123")
 
-	users := make([]*User, 0)
-	err = builder.NewApiBuilder("userlist", builder.APITYPE_QUERY).
-		Invoke(context.Background(), paramBuilder, client, &users)
+	api := builder.NewApiBuilder("add_user", builder.APITYPE_EXEC)
+	result := &UserAddResult{}
+	err = api.Invoke(context.Background(), params, client, &result)
 	if err != nil {
 		log.Fatal(err)
 	}
-
-	for _, user := range users {
-		fmt.Println(user)
-	}
+	fmt.Println(result)
 }
