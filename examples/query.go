@@ -6,6 +6,7 @@ import (
 	"gitea.ipicture.vip/jerry/db-sdk/pkg/builder"
 	"google.golang.org/grpc"
 	"log"
+	"time"
 )
 
 type User struct {
@@ -30,7 +31,10 @@ func Query() {
 
 	api := builder.NewApiBuilder("userlist", builder.APITYPE_QUERY)
 	result := make([]*User, 0)
-	err = api.Invoke(context.Background(), params, client, &result)
+
+	ctx, cancel := context.WithDeadline(context.Background(), time.Now().Add(time.Second*1))
+	defer cancel()
+	err = api.Invoke(ctx, params, client, &result)
 	if err != nil {
 		log.Fatal(err)
 	}
